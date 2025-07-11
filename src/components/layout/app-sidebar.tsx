@@ -2,7 +2,14 @@
 
 import type * as React from "react";
 import { Link } from "react-router-dom";
-import { LayoutDashboard, LinkIcon, Info, Globe } from "lucide-react";
+import {
+  LayoutDashboard,
+  LinkIcon,
+  Info,
+  Globe,
+  ReceiptText,
+  Grid2x2Check,
+} from "lucide-react";
 
 import {
   Sidebar,
@@ -32,12 +39,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     {
       title: "Results Dashboard",
       url: "/results",
-      icon: Info,
+      icon: Grid2x2Check,
     },
     {
       title: "Details View",
       url: "/details",
-      icon: Info,
+      icon: ReceiptText,
     },
   ];
 

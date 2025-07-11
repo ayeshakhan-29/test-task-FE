@@ -28,7 +28,7 @@ export function BulkActions({ selectedCount, onBulkDelete }: BulkActionsProps) {
 
   return (
     <>
-      <div className="mb-4 flex justify-end">
+      <div className="mb-4 flex justify-end text-white">
         <Button variant="destructive" onClick={() => setShowConfirm(true)}>
           <Trash2 className="h-4 w-4 mr-2" /> Delete Selected ({selectedCount})
         </Button>

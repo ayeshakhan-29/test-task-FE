@@ -2,6 +2,7 @@
 
 import { useReducer, useRef } from "react";
 import { LinkIcon } from "lucide-react";
+import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AddUrlForm } from "@/components/url-management/add-url-form";
 import { UrlTable } from "@/components/url-management/url-table";
@@ -23,7 +24,7 @@ const urlReducer = (state: UrlItem[], action: UrlAction): UrlItem[] => {
       const newUrl: UrlItem = {
         id: crypto.randomUUID(), // Unique ID for each URL
         url: action.payload.url,
-        status: "Pending",
+        status: "Queued",
         isChecked: false,
       };
       return [...state, newUrl];
@@ -55,7 +56,7 @@ const urlReducer = (state: UrlItem[], action: UrlAction): UrlItem[] => {
 
 export function UrlManagementScreen() {
   const [urls, dispatch] = useReducer(urlReducer, []);
-  const crawlTimers = useRef<Map<string, NodeJS.Timeout>>(new Map()); // To store timers for each URL
+  const crawlTimers = useRef<Map<string, NodeJS.Timeout>>(new Map());
 
   const clearCrawlTimer = (id: string) => {
     if (crawlTimers.current.has(id)) {
@@ -71,31 +72,36 @@ export function UrlManagementScreen() {
   const handleToggleStatus = (id: string, currentStatus: UrlStatus) => {
     let newStatus: UrlStatus;
     if (currentStatus === "Crawling") {
-      newStatus = "Stopped"; // Stop the crawl
-      clearCrawlTimer(id); // Clear the auto-completion timer
+      newStatus = "Stopped";
+      clearCrawlTimer(id);
     } else if (
       currentStatus === "Stopped" ||
-      currentStatus === "Pending" ||
+      currentStatus === "Queued" ||
       currentStatus === "Error"
     ) {
-      newStatus = "Crawling"; // Start the crawl
-      // Set a timer for automatic completion after 10 seconds
+      newStatus = "Crawling";
       const timer = setTimeout(() => {
         dispatch({
           type: "TOGGLE_STATUS",
           payload: { id, newStatus: "Completed" },
         });
-        crawlTimers.current.delete(id); // Clean up timer reference
+        // Show toast when crawl completes
+        toast.success("Crawl Completed!", {
+          description:
+            "Crawled successfully, go to results dashboard for details.",
+          duration: 5000,
+        });
+        crawlTimers.current.delete(id);
       }, 10000); // 10 seconds
       crawlTimers.current.set(id, timer);
     } else {
-      newStatus = currentStatus; // Keep status if completed
+      newStatus = currentStatus;
     }
     dispatch({ type: "TOGGLE_STATUS", payload: { id, newStatus } });
   };
 
   const handleDeleteUrl = (id: string) => {
-    clearCrawlTimer(id); // Clear timer if deleting an active crawl
+    clearCrawlTimer(id);
     dispatch({ type: "DELETE_URL", payload: { id } });
   };
 
@@ -108,7 +114,6 @@ export function UrlManagementScreen() {
   };
 
   const handleBulkDelete = () => {
-    // Clear timers for all selected URLs before deleting
     urls
       .filter((url) => url.isChecked)
       .forEach((url) => clearCrawlTimer(url.id));
@@ -116,16 +121,10 @@ export function UrlManagementScreen() {
   };
 
   const handleReRunUrl = (id: string) => {
-    clearCrawlTimer(id); // Clear any lingering timer before re-running
-    dispatch({ type: "TOGGLE_STATUS", payload: { id, newStatus: "Pending" } }); // Set to Pending for re-run
+    clearCrawlTimer(id);
+    dispatch({ type: "TOGGLE_STATUS", payload: { id, newStatus: "Queued" } });
     console.log(`Re-running URL: ${id}`);
-    alert(`Simulated re-run for URL: ${id}. Status set to Pending.`);
-  };
-
-  const handleViewDetails = (url: UrlItem) => {
-    console.log("View details for URL:", url);
-    alert(`Simulated navigation to details for: ${url.url}. (ID: ${url.id})`);
-    // In a real app, you'd navigate to a details page, e.g., router.push(`/details/${url.id}`);
+    alert(`Simulated re-run for URL: ${id}. Status set to Queued.`);
   };
 
   const selectedUrlsCount = urls.filter((url) => url.isChecked).length;
@@ -152,7 +151,6 @@ export function UrlManagementScreen() {
             onToggleCheck={handleToggleCheck}
             onToggleSelectAll={handleToggleSelectAll}
             onReRunUrl={handleReRunUrl}
-            onViewDetails={handleViewDetails}
             allUrlsSelected={allUrlsSelected}
           />
         </CardContent>

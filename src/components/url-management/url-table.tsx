@@ -7,7 +7,6 @@ import {
   CheckCircle,
   XCircle,
   Loader2,
-  Eye,
   RotateCw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -30,7 +29,6 @@ interface UrlTableProps {
   onToggleCheck: (id: string) => void;
   onToggleSelectAll: (checked: boolean) => void;
   onReRunUrl: (id: string) => void;
-  onViewDetails: (url: UrlItem) => void;
   allUrlsSelected: boolean;
 }
 
@@ -41,7 +39,6 @@ export function UrlTable({
   onToggleCheck,
   onToggleSelectAll,
   onReRunUrl,
-  onViewDetails,
   allUrlsSelected,
 }: UrlTableProps) {
   if (urls.length === 0) {
@@ -88,7 +85,7 @@ export function UrlTable({
                 <span
                   className={cn(
                     "inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium",
-                    urlItem.status === "Pending" && "bg-gray-100 text-gray-800",
+                    urlItem.status === "Queued" && "bg-gray-100 text-gray-800",
                     urlItem.status === "Crawling" &&
                       "bg-blue-100 text-blue-800",
                     urlItem.status === "Completed" &&
@@ -114,14 +111,6 @@ export function UrlTable({
                 <div className="flex justify-center gap-2">
                   {urlItem.status === "Completed" ? (
                     <>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => onViewDetails(urlItem)}
-                        aria-label="View Results"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
                       <Button
                         variant="outline"
                         size="icon"

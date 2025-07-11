@@ -1,6 +1,9 @@
 @import "tailwindcss/theme";
 @import "tailwindcss/utilities";
 @import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
 
 /* Your custom styles below */
 :root {

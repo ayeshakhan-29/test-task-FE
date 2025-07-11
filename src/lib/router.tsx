@@ -5,6 +5,8 @@ import { NotFoundPage } from "@/pages/NotFoundPage";
 import LoginPage from "@/pages/LoginPage";
 import SignUpPage from "@/pages/SignUpPage";
 import { UrlManagementScreen } from "@/pages/UrlManagementPage";
+import { ResultsDashboard } from "@/pages/ResultsDashboardPage";
+import { UrlDetailsPage } from "@/pages/UrlDetailsPage";
 
 export const router = createBrowserRouter([
   {
@@ -18,6 +20,14 @@ export const router = createBrowserRouter([
       {
         path: "urls",
         element: <UrlManagementScreen />,
+      },
+      {
+        path: "results",
+        element: <ResultsDashboard />,
+      },
+      {
+        path: "details/:id",
+        element: <UrlDetailsPage />,
       },
       {
         path: "*",

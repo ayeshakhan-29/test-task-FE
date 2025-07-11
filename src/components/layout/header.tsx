@@ -20,9 +20,7 @@ export function Header() {
         to="/"
         className="flex items-center gap-2 text-lg font-semibold md:text-base"
       >
-        <Globe className="h-6 w-6" />
         <span className="sr-only">URL Analyzer</span>
-        <span className="hidden md:inline">URL Analyzer</span>
       </Link>
       <Button
         variant="ghost"

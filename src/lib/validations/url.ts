@@ -7,7 +7,7 @@ export const urlInputSchema = z.object({
 export type UrlInputFormData = z.infer<typeof urlInputSchema>;
 
 export type UrlStatus =
-  | "Pending"
+  | "Queued"
   | "Crawling"
   | "Completed"
   | "Stopped"

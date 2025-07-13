@@ -91,10 +91,10 @@ export function ResultsTable({
                 Title {getSortIcon("title")}
               </Button>
               <Input
-                placeholder="Filter title..."
+                placeholder="Filter title"
                 value={filters.title}
                 onChange={(e) => onFilterChange("title", e.target.value)}
-                className="h-8 my-1" // Changed to my-1 for top and bottom margin
+                className="h-8 my-1 placeholder:text-sm md:placeholder:text-base"
               />
             </TableHead>
             <TableHead className="min-w-[120px]">
@@ -106,10 +106,10 @@ export function ResultsTable({
                 HTML Version {getSortIcon("htmlVersion")}
               </Button>
               <Input
-                placeholder="Filter version..."
+                placeholder="Filter version"
                 value={filters.htmlVersion}
                 onChange={(e) => onFilterChange("htmlVersion", e.target.value)}
-                className="h-8 my-1" // Changed to my-1 for top and bottom margin
+                className="h-8 my-1 placeholder:text-sm md:placeholder:text-base"
               />
             </TableHead>
             <TableHead className="min-w-[100px] text-center">
@@ -121,7 +121,7 @@ export function ResultsTable({
                 Internal <LinkIcon className="ml-1 h-4 w-4" />{" "}
                 {getSortIcon("internalLinks")}
               </Button>
-              <div className="h-8 my-1" /> {/* Placeholder with my-1 */}
+              <div className="h-8 my-1" />
             </TableHead>
             <TableHead className="min-w-[100px] text-center">
               <Button
@@ -132,7 +132,7 @@ export function ResultsTable({
                 External <ExternalLink className="ml-1 h-4 w-4" />{" "}
                 {getSortIcon("externalLinks")}
               </Button>
-              <div className="h-8 my-1" /> {/* Placeholder with my-1 */}
+              <div className="h-8 my-1" />
             </TableHead>
             <TableHead className="min-w-[100px] text-center">
               <Button
@@ -143,7 +143,7 @@ export function ResultsTable({
                 Broken <XCircle className="ml-1 h-4 w-4" />{" "}
                 {getSortIcon("brokenLinks")}
               </Button>
-              <div className="h-8 my-1" /> {/* Placeholder with my-1 */}
+              <div className="h-8 my-1" />
             </TableHead>
             <TableHead className="min-w-[120px] text-center">
               <Button

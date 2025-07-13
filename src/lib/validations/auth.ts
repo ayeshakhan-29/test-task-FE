@@ -13,10 +13,10 @@ export const loginSchema = z.object({
 
 export const signUpSchema = z
   .object({
-    firstName: z
+    fullName: z
       .string()
-      .min(1, "First name is required")
-      .min(2, "First name must be at least 2 characters")
+      .min(1, "Full name is required")
+      .min(2, "Full name must be at least 2 characters")
       .max(50, "First name must be less than 50 characters"),
     lastName: z
       .string()
@@ -40,12 +40,6 @@ export const signUpSchema = z
         "Password must contain at least one uppercase letter, one lowercase letter, and one number"
       ),
     confirmPassword: z.string().min(1, "Please confirm your password"),
-    acceptTerms: z
-      .boolean()
-      .refine(
-        (val) => val === true,
-        "You must accept the terms and conditions"
-      ),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",

@@ -13,6 +13,7 @@ import type {
 
 import { useNavigate } from "react-router-dom";
 import { dummyResults } from "@/lib/data/results-data";
+import { motion } from "framer-motion";
 
 const ALL_RESULTS = dummyResults; // Use the pre-generated dummy results
 
@@ -129,13 +130,46 @@ export function ResultsDashboard() {
   const totalPages = Math.ceil(filteredAndSortedData.length / pageSize);
 
   return (
-    <div className="p-4 md:p-6 lg:p-8">
+    <motion.div
+      className="p-4 md:p-6 lg:p-8"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+    >
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <BarChart3 className="h-6 w-6" /> Results Dashboard
-          </CardTitle>
+          <motion.div
+            className="flex items-center gap-2"
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2, duration: 0.4, ease: "easeOut" }}
+          >
+            <motion.div
+              className="flex items-center gap-2"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                duration: 0.6,
+                ease: "easeOut",
+              }}
+            >
+              <BarChart3 className="h-6 w-6" />
+            </motion.div>
+            <motion.h2
+              className="text-xl font-semibold"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{
+                delay: 0.4,
+                duration: 0.5,
+                ease: [0.25, 0.1, 0.25, 1],
+              }}
+            >
+              Results Dashboard
+            </motion.h2>
+          </motion.div>
         </CardHeader>
+
         <CardContent>
           <ResultsTable
             data={paginatedData}
@@ -157,6 +191,6 @@ export function ResultsDashboard() {
           />
         </CardContent>
       </Card>
-    </div>
+    </motion.div>
   );
 }

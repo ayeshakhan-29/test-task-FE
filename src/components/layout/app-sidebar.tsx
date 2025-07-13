@@ -27,11 +27,6 @@ import {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const mainNavigation = [
     {
-      title: "Dashboard",
-      url: "/",
-      icon: LayoutDashboard,
-    },
-    {
       title: "URL Management",
       url: "/urls",
       icon: LinkIcon,
@@ -52,14 +47,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar {...props}>
       <SidebarHeader>
-        {/* You can add a logo or app name here */}
         <Link
-          to="/"
+          to="/urls"
           className="flex items-center gap-2 text-lg font-semibold md:text-base p-2"
         >
           <Globe className="h-6 w-6" />
           <span className="sr-only">URL Analyzer</span>
-          <span className="hidden group-data-[state=expanded]:inline">
+          <span className="hidden group-data-[state=expanded]:inline text-black">
             URL Analyzer
           </span>
         </Link>
@@ -79,12 +73,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     }
                   >
                     {item.disabled ? (
-                      <div className="flex items-center gap-2 w-full">
+                      <div className="flex items-center gap-2 w-full hover:text-primary">
                         <item.icon className="h-4 w-4" />
                         <span>{item.title}</span>
                       </div>
                     ) : (
-                      <Link to={item.url} className="w-full">
+                      <Link to={item.url} className="w-full hover:text-primary">
                         <item.icon className="h-4 w-4" />
                         <span>{item.title}</span>
                       </Link>

@@ -16,6 +16,7 @@ import { UrlOverviewCard } from "@/components/url-details/url-overview-card";
 import { LinkRatioChartCard } from "@/components/url-details/link-ratio-chart-card";
 import { BrokenLinksListCard } from "@/components/url-details/broken-links-list-card";
 import { dummyResults } from "@/lib/data/results-data";
+import { motion } from "framer-motion";
 
 export function UrlDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -25,7 +26,7 @@ export function UrlDetailsPage() {
   useEffect(() => {
     // Simulate API call with a small delay
     const timer = setTimeout(() => {
-      const foundUrl = dummyResults.find(url => url.id === id) || null;
+      const foundUrl = dummyResults.find((url) => url.id === id) || null;
       setUrlData(foundUrl);
       setIsLoading(false);
     }, 300);
@@ -51,20 +52,54 @@ export function UrlDetailsPage() {
   }
 
   return (
-    <div className="p-4 md:p-6 lg:p-8">
+    <motion.div
+      className="p-4 md:p-6 lg:p-8"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+    >
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <BarChart3 className="h-6 w-6" /> URL Details: {urlData.title}
-          </CardTitle>
-          <CardDescription className="break-all">{urlData.url}</CardDescription>
+          <motion.div
+            className="flex items-center gap-2"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+          >
+            <BarChart3 className="h-6 w-6" />
+            <motion.span
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.4, ease: "easeOut" }}
+            >
+              <CardTitle>URL Details: {urlData.title}</CardTitle>
+            </motion.span>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.4 }}
+          >
+            <CardDescription className="break-all">
+              {urlData.url}
+            </CardDescription>
+          </motion.div>
         </CardHeader>
-        <CardContent className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <UrlOverviewCard urlData={urlData} delay={0.1} />
-          <LinkRatioChartCard urlData={urlData} delay={0.2} />
-          <BrokenLinksListCard urlData={urlData} delay={0.3} />
+
+        <CardContent>
+          <motion.div
+            className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.4, duration: 0.4 }}
+          >
+            <UrlOverviewCard urlData={urlData} delay={0.1} />
+            <LinkRatioChartCard urlData={urlData} delay={0.2} />
+            <BrokenLinksListCard urlData={urlData} delay={0.3} />
+          </motion.div>
         </CardContent>
       </Card>
-    </div>
+    </motion.div>
   );
 }

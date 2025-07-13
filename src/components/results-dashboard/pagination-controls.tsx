@@ -28,7 +28,7 @@ export function PaginationControls({
   const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   return (
-    <div className="flex items-center justify-between px-2 py-4">
+    <div className="flex md:flex-row flex-col items-center justify-between px-2 py-4">
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         Rows per page:
         <Select
@@ -50,7 +50,7 @@ export function PaginationControls({
           {Math.min(currentPage * pageSize, totalItems)} of {totalItems}
         </span>
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 md:mt-0 mt-2">
         <Button
           variant="outline"
           size="icon"

@@ -8,6 +8,7 @@ import { AddUrlForm } from "@/components/url-management/add-url-form";
 import { UrlTable } from "@/components/url-management/url-table";
 import { BulkActions } from "@/components/url-management/bulk-actions";
 import type { UrlItem, UrlStatus } from "@/lib/validations/url";
+import { motion } from "framer-motion";
 
 // Reducer for managing URL items
 type UrlAction =
@@ -131,30 +132,54 @@ export function UrlManagementScreen() {
   const allUrlsSelected = urls.length > 0 && urls.every((url) => url.isChecked);
 
   return (
-    <div className="p-4 md:p-6 lg:p-8">
+    <motion.div
+      className="p-4 md:p-6 lg:p-8"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+    >
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <LinkIcon className="h-6 w-6" /> URL Management
-          </CardTitle>
+          <motion.div
+            className="flex items-center gap-2"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+          >
+            <LinkIcon className="h-6 w-6" />
+            <motion.span
+              initial={{ opacity: 0, x: -8 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1, duration: 0.3 }}
+            >
+              <CardTitle>URL Management</CardTitle>
+            </motion.span>
+          </motion.div>
         </CardHeader>
+
         <CardContent>
-          <AddUrlForm onAddUrl={handleAddUrl} />
-          <BulkActions
-            selectedCount={selectedUrlsCount}
-            onBulkDelete={handleBulkDelete}
-          />
-          <UrlTable
-            urls={urls}
-            onToggleStatus={handleToggleStatus}
-            onDeleteUrl={handleDeleteUrl}
-            onToggleCheck={handleToggleCheck}
-            onToggleSelectAll={handleToggleSelectAll}
-            onReRunUrl={handleReRunUrl}
-            allUrlsSelected={allUrlsSelected}
-          />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2, duration: 0.4 }}
+          >
+            <AddUrlForm onAddUrl={handleAddUrl} />
+            <BulkActions
+              selectedCount={selectedUrlsCount}
+              onBulkDelete={handleBulkDelete}
+            />
+            <UrlTable
+              urls={urls}
+              onToggleStatus={handleToggleStatus}
+              onDeleteUrl={handleDeleteUrl}
+              onToggleCheck={handleToggleCheck}
+              onToggleSelectAll={handleToggleSelectAll}
+              onReRunUrl={handleReRunUrl}
+              allUrlsSelected={allUrlsSelected}
+            />
+          </motion.div>
         </CardContent>
       </Card>
-    </div>
+    </motion.div>
   );
 }

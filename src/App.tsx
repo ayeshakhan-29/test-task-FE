@@ -1,7 +1,7 @@
-import { RouterProvider } from 'react-router-dom';
-import { ThemeProvider } from '@/components/theme-provider';
-import { router } from '@/lib/router';
-import { Toaster } from 'sonner';
+import { RouterProvider } from "react-router-dom";
+import { ThemeProvider } from "@/components/theme-provider";
+import { router } from "@/lib/router";
+import { Toaster } from "sonner";
 
 function App() {
   return (

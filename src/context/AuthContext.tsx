@@ -2,10 +2,11 @@ import { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { config } from "@/config";
 import { useSignUp } from "@/hooks/useSignUp";
+import { useLogin } from "@/hooks/useLogin";
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  login: (token: string) => void;
+  login: (credentials: any) => void;
   logout: () => void;
   signUp: (credentials: any) => void;
 }
@@ -22,18 +23,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsAuthenticated(!!token);
   }, []);
 
-  const login = (token: string) => {
-    setIsAuthenticated(true);
-    localStorage.setItem(config.auth.tokenKey, token);
-  };
+  const { mutate: signUp } = useSignUp();
+  const { mutate: login } = useLogin();
 
   const logout = () => {
     setIsAuthenticated(false);
     localStorage.removeItem(config.auth.tokenKey);
     navigate("/login");
   };
-
-  const { mutate: signUp } = useSignUp();
 
   return (
     <AuthContext.Provider value={{ isAuthenticated, login, logout, signUp }}>

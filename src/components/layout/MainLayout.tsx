@@ -5,7 +5,7 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "./app-sidebar";
 import { Header } from "./header";
 
-const AUTH_ROUTES = ['/login', '/signup'];
+const AUTH_ROUTES = ["/login", "/signup"];
 
 export function MainLayout() {
   const location = useLocation();

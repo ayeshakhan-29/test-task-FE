@@ -8,6 +8,7 @@ import { UrlManagementScreen } from "@/pages/UrlManagementPage";
 import { ResultsDashboard } from "@/pages/ResultsDashboardPage";
 import { UrlDetailsPage } from "@/pages/UrlDetailsPage";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { ProtectedAuthRoute } from "@/components/ProtectedAuthRoute";
 import { AuthProvider } from "@/context/AuthContext";
 
 export const router = createBrowserRouter([
@@ -19,66 +20,52 @@ export const router = createBrowserRouter([
     ),
     children: [
       {
+        path: "login",
+        element: (
+          <ProtectedAuthRoute>
+            <LoginPage />
+          </ProtectedAuthRoute>
+        ),
+      },
+      {
+        path: "signup",
+        element: (
+          <ProtectedAuthRoute>
+            <SignUpPage />
+          </ProtectedAuthRoute>
+        ),
+      },
+      {
         path: "/",
-        element: <MainLayout />,
-        children: [
-          {
-            path: "login",
-            element: (
-              <AuthProvider>
-                <LoginPage />
-              </AuthProvider>
-            ),
-          },
-          {
-            path: "signup",
-            element: (
-              <AuthProvider>
-                <SignUpPage />
-              </AuthProvider>
-            ),
-          },
-          {
-            index: true,
-            element: (
-              <ProtectedRoute>
-                <HomePage />
-              </ProtectedRoute>
-            ),
-          },
-          {
-            path: "urls",
-            element: (
-              <ProtectedRoute>
-                <UrlManagementScreen />
-              </ProtectedRoute>
-            ),
-          },
-          {
-            path: "results",
-            element: (
-              <ProtectedRoute>
-                <ResultsDashboard />
-              </ProtectedRoute>
-            ),
-          },
-          {
-            path: "details/:id",
-            element: (
-              <ProtectedRoute>
-                <UrlDetailsPage />
-              </ProtectedRoute>
-            ),
-          },
-        ],
+        element: (
+          <ProtectedRoute>
+            <HomePage />
+          </ProtectedRoute>
+        ),
       },
       {
-        path: "/login",
-        element: <LoginPage />,
+        path: "urls",
+        element: (
+          <ProtectedRoute>
+            <UrlManagementScreen />
+          </ProtectedRoute>
+        ),
       },
       {
-        path: "/signup",
-        element: <SignUpPage />,
+        path: "results",
+        element: (
+          <ProtectedRoute>
+            <ResultsDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "details/:id",
+        element: (
+          <ProtectedRoute>
+            <UrlDetailsPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "*",

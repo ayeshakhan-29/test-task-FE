@@ -5,11 +5,15 @@ import { Separator } from "@/components/ui/separator";
 import { Link } from "react-router-dom";
 import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/AuthContext";
+import { toast } from "sonner";
 
 export function Header() {
+  const { logout } = useAuth();
+
   const handleSignOut = () => {
-    console.log("Signing out...");
-    alert("Signed out!");
+    logout();
+    toast.success("You have been signed out.");
   };
 
   return (

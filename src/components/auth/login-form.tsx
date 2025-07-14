@@ -17,11 +17,15 @@ import {
 } from "@/components/ui/form";
 import { loginSchema, type LoginFormData } from "@/lib/validations/auth";
 import { useNavigate } from "react-router-dom";
+import { useLogin } from "@/hooks/useLogin";
+import { toast } from "sonner";
+import { config } from "@/config";
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { mutate: login, isPending } = useLogin();
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -31,19 +35,34 @@ export default function LoginForm() {
     },
   });
 
-  const onSubmit = async (data: LoginFormData) => {
-    setIsLoading(true);
+  const onSubmit = (data: LoginFormData) => {
+    login(
+      {
+        email: data.email,
+        password: data.password,
+      },
+      {
+        onSuccess: (response) => {
+          localStorage.setItem(config.auth.tokenKey, response.token);
+          toast.success(response.message);
+          navigate("/");
+          setIsLoading(false);
+        },
+        onError: (error: any) => {
+          console.error("Login error:", error);
+          setIsLoading(false);
 
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log("Login data:", data);
-      alert("Login successful! (Check console for form data)");
-      navigate("/");
-    } catch (error) {
-      console.error("Login failed:", error);
-    } finally {
-      setIsLoading(false);
-    }
+          const errorMessage =
+            error.response?.data?.error ||
+            error.response?.data?.message ||
+            error.response?.data?.errors ||
+            error.message ||
+            "Failed to login.";
+
+          toast.error(errorMessage);
+        },
+      }
+    );
   };
 
   return (
@@ -145,6 +164,7 @@ export default function LoginForm() {
               variant="link"
               className="px-0 text-base font-medium text-primary hover:text-primary/80"
               onClick={() => navigate("/signup")}
+              disabled={isPending}
             >
               Sign up
             </Button>

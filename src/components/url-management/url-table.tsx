@@ -30,6 +30,9 @@ interface UrlTableProps {
   onToggleSelectAll: (checked: boolean) => void;
   onReRunUrl: (id: string) => void;
   allUrlsSelected: boolean;
+  isLoading?: boolean;
+  isError?: boolean;
+  error?: string;
 }
 
 export function UrlTable({
@@ -40,7 +43,27 @@ export function UrlTable({
   onToggleSelectAll,
   onReRunUrl,
   allUrlsSelected,
+  isLoading = false,
+  isError = false,
+  error,
 }: UrlTableProps) {
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center py-8">
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+        <span className="ml-2">Loading URLs...</span>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="text-center text-destructive py-8">
+        <p>Error loading URLs: {error || "Unknown error occurred"}</p>
+      </div>
+    );
+  }
+
   if (urls.length === 0) {
     return (
       <p className="text-center text-muted-foreground py-8">
@@ -114,7 +137,10 @@ export function UrlTable({
                       <Button
                         variant="outline"
                         size="icon"
-                        onClick={() => onReRunUrl(urlItem.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onReRunUrl(urlItem.id);
+                        }}
                         aria-label="Re-run crawl"
                       >
                         <RotateCw className="h-4 w-4" />

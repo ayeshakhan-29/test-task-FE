@@ -10,8 +10,17 @@ import { useCrawlContext } from "@/context/CrawlContext";
 import { motion } from "framer-motion";
 
 export function UrlManagementScreen() {
-  const { urls, crawlUrl, deleteUrl, toggleStatus, reRunUrl } =
-    useCrawlContext();
+  const {
+    urls,
+    crawledUrls,
+    isLoading,
+    isError,
+    error,
+    crawlUrl,
+    deleteUrl,
+    toggleStatus,
+    reRunUrl,
+  } = useCrawlContext();
 
   const handleBulkDelete = () => {
     const checkedUrls = urls.filter((url) => url.isChecked);
@@ -30,8 +39,22 @@ export function UrlManagementScreen() {
     toast.error("Toggle select all not implemented in context yet");
   };
 
-  const selectedUrlsCount = urls.filter((url) => url.isChecked).length;
-  const allUrlsSelected = urls.length > 0 && urls.every((url) => url.isChecked);
+  const allUrls = [...urls];
+
+  crawledUrls.forEach((crawledUrl) => {
+    if (!allUrls.some((url) => url.id === crawledUrl.id)) {
+      allUrls.push({
+        id: crawledUrl.id,
+        url: crawledUrl.url,
+        status: "Completed",
+        isChecked: false,
+      });
+    }
+  });
+
+  const selectedUrlsCount = allUrls.filter((url) => url.isChecked).length;
+  const allUrlsSelected =
+    allUrls.length > 0 && allUrls.every((url) => url.isChecked);
 
   return (
     <motion.div
@@ -71,13 +94,16 @@ export function UrlManagementScreen() {
               onBulkDelete={handleBulkDelete}
             />
             <UrlTable
-              urls={urls}
+              urls={allUrls}
               onToggleStatus={toggleStatus}
               onDeleteUrl={deleteUrl}
               onToggleCheck={handleToggleCheck}
               onToggleSelectAll={handleToggleSelectAll}
               onReRunUrl={reRunUrl}
               allUrlsSelected={allUrlsSelected}
+              isLoading={isLoading}
+              isError={isError}
+              error={error?.message}
             />
           </motion.div>
         </CardContent>

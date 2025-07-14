@@ -10,12 +10,15 @@ import { UrlDetailsPage } from "@/pages/UrlDetailsPage";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { ProtectedAuthRoute } from "@/components/ProtectedAuthRoute";
 import { AuthProvider } from "@/context/AuthContext";
+import { CrawlProvider } from "@/context/CrawlContext";
 
 export const router = createBrowserRouter([
   {
     element: (
       <AuthProvider>
-        <MainLayout />
+        <CrawlProvider>
+          <MainLayout />
+        </CrawlProvider>
       </AuthProvider>
     ),
     children: [

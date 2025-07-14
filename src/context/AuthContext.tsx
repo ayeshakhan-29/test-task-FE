@@ -1,8 +1,15 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import { config } from "@/config";
 import { useSignUp } from "@/hooks/useSignUp";
 import { useLogin } from "@/hooks/useLogin";
+import { toast } from "sonner";
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -17,18 +24,65 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
 
+  const { mutate: loginMutate } = useLogin();
+  const { mutate: signUpMutate } = useSignUp();
+
   useEffect(() => {
-    // Check for authentication token or user session
     const token = localStorage.getItem(config.auth.tokenKey);
     setIsAuthenticated(!!token);
   }, []);
 
-  const { mutate: signUp } = useSignUp();
-  const { mutate: login } = useLogin();
+  const login = useCallback(
+    (credentials: any) => {
+      loginMutate(credentials, {
+        onSuccess: (response: any) => {
+          localStorage.setItem(config.auth.tokenKey, response.token);
+          setIsAuthenticated(true);
+          toast.success(response.message || "Login successful");
+          navigate("/");
+        },
+        onError: (error: any) => {
+          const errorMessage =
+            error?.response?.data?.error ||
+            error?.response?.data?.message ||
+            error?.response?.data?.errors ||
+            error.message ||
+            "Login failed.";
+
+          toast.error(errorMessage);
+        },
+      });
+    },
+    [loginMutate, navigate]
+  );
+
+  const signUp = useCallback(
+    (credentials: any) => {
+      signUpMutate(credentials, {
+        onSuccess: (response: any) => {
+          localStorage.setItem(config.auth.tokenKey, response.token);
+          setIsAuthenticated(true);
+          toast.success(response.message || "Sign up successful");
+          navigate("/");
+        },
+        onError: (error: any) => {
+          const errorMessage =
+            error?.response?.data?.error ||
+            error?.response?.data?.message ||
+            error?.response?.data?.errors ||
+            error.message ||
+            "Sign up failed.";
+
+          toast.error(errorMessage);
+        },
+      });
+    },
+    [signUpMutate, navigate]
+  );
 
   const logout = () => {
-    setIsAuthenticated(false);
     localStorage.removeItem(config.auth.tokenKey);
+    setIsAuthenticated(false);
     navigate("/login");
   };
 
@@ -41,7 +95,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;

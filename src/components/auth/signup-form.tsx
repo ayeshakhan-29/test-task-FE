@@ -16,15 +16,14 @@ import {
 } from "@/components/ui/form";
 import { signUpSchema, type SignUpFormData } from "@/lib/validations/auth";
 import { useNavigate } from "react-router-dom";
-import { useSignUp } from "@/hooks/useSignUp";
-import { toast } from "sonner";
+import { useAuth } from "@/context/AuthContext";
 
 export default function SignUpForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { mutate: signUp, isPending } = useSignUp();
+  const { signUp } = useAuth();
 
   const form = useForm<SignUpFormData>({
     resolver: zodResolver(signUpSchema),
@@ -35,34 +34,15 @@ export default function SignUpForm() {
       confirmPassword: "",
     },
   });
+
   const onSubmit = (data: SignUpFormData) => {
     setIsLoading(true);
-    signUp(
-      {
-        full_name: data.fullName,
-        email: data.email,
-        password: data.password,
-        confirm_password: data.confirmPassword,
-      },
-      {
-        onSuccess: (response) => {
-          toast.success(response.message);
-          navigate("/login");
-        },
-        onError: (error: any) => {
-          console.error("Signup error:", error);
-
-          const errorMessage =
-            error.response?.data?.error ||
-            error.response?.data?.message ||
-            error.response?.data?.errors ||
-            error.message ||
-            "Failed to create account.";
-
-          toast.error(errorMessage);
-        },
-      }
-    );
+    signUp({
+      full_name: data.fullName,
+      email: data.email,
+      password: data.password,
+      confirm_password: data.confirmPassword,
+    });
     setIsLoading(false);
   };
 
@@ -232,7 +212,7 @@ export default function SignUpForm() {
             variant="link"
             className="px-0 text-base font-medium text-primary hover:text-primary/80"
             onClick={() => navigate("/login")}
-            disabled={isPending}
+            disabled={isLoading}
           >
             Sign in
           </Button>

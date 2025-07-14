@@ -17,15 +17,13 @@ import {
 } from "@/components/ui/form";
 import { loginSchema, type LoginFormData } from "@/lib/validations/auth";
 import { useNavigate } from "react-router-dom";
-import { useLogin } from "@/hooks/useLogin";
-import { toast } from "sonner";
-import { config } from "@/config";
+import { useAuth } from "@/context/AuthContext";
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { mutate: login, isPending } = useLogin();
+  const { login } = useAuth();
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -36,33 +34,11 @@ export default function LoginForm() {
   });
 
   const onSubmit = (data: LoginFormData) => {
-    login(
-      {
-        email: data.email,
-        password: data.password,
-      },
-      {
-        onSuccess: (response) => {
-          localStorage.setItem(config.auth.tokenKey, response.token);
-          toast.success(response.message);
-          navigate("/");
-          setIsLoading(false);
-        },
-        onError: (error: any) => {
-          console.error("Login error:", error);
-          setIsLoading(false);
-
-          const errorMessage =
-            error.response?.data?.error ||
-            error.response?.data?.message ||
-            error.response?.data?.errors ||
-            error.message ||
-            "Failed to login.";
-
-          toast.error(errorMessage);
-        },
-      }
-    );
+    setIsLoading(true);
+    login({
+      email: data.email,
+      password: data.password,
+    });
   };
 
   return (
@@ -164,7 +140,7 @@ export default function LoginForm() {
               variant="link"
               className="px-0 text-base font-medium text-primary hover:text-primary/80"
               onClick={() => navigate("/signup")}
-              disabled={isPending}
+              disabled={isLoading}
             >
               Sign up
             </Button>

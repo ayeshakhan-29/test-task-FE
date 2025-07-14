@@ -1,131 +1,33 @@
 "use client";
 
-import { useReducer, useRef } from "react";
 import { LinkIcon } from "lucide-react";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AddUrlForm } from "@/components/url-management/add-url-form";
 import { UrlTable } from "@/components/url-management/url-table";
 import { BulkActions } from "@/components/url-management/bulk-actions";
-import type { UrlItem, UrlStatus } from "@/lib/validations/url";
+import { useCrawlContext } from "@/context/CrawlContext";
 import { motion } from "framer-motion";
 
-// Reducer for managing URL items
-type UrlAction =
-  | { type: "ADD_URL"; payload: { url: string } }
-  | { type: "DELETE_URL"; payload: { id: string } }
-  | { type: "TOGGLE_STATUS"; payload: { id: string; newStatus: UrlStatus } }
-  | { type: "TOGGLE_CHECK"; payload: { id: string } }
-  | { type: "TOGGLE_SELECT_ALL"; payload: { checked: boolean } }
-  | { type: "BULK_DELETE" };
-
-const urlReducer = (state: UrlItem[], action: UrlAction): UrlItem[] => {
-  switch (action.type) {
-    case "ADD_URL":
-      const newUrl: UrlItem = {
-        id: crypto.randomUUID(), // Unique ID for each URL
-        url: action.payload.url,
-        status: "Queued",
-        isChecked: false,
-      };
-      return [...state, newUrl];
-    case "DELETE_URL":
-      return state.filter((url) => url.id !== action.payload.id);
-    case "TOGGLE_STATUS":
-      return state.map((url) =>
-        url.id === action.payload.id
-          ? { ...url, status: action.payload.newStatus }
-          : url
-      );
-    case "TOGGLE_CHECK":
-      return state.map((url) =>
-        url.id === action.payload.id
-          ? { ...url, isChecked: !url.isChecked }
-          : url
-      );
-    case "TOGGLE_SELECT_ALL":
-      return state.map((url) => ({
-        ...url,
-        isChecked: action.payload.checked,
-      }));
-    case "BULK_DELETE":
-      return state.filter((url) => !url.isChecked);
-    default:
-      return state;
-  }
-};
-
 export function UrlManagementScreen() {
-  const [urls, dispatch] = useReducer(urlReducer, []);
-  const crawlTimers = useRef<Map<string, NodeJS.Timeout>>(new Map());
-
-  const clearCrawlTimer = (id: string) => {
-    if (crawlTimers.current.has(id)) {
-      clearTimeout(crawlTimers.current.get(id)!);
-      crawlTimers.current.delete(id);
-    }
-  };
-
-  const handleAddUrl = (url: string) => {
-    dispatch({ type: "ADD_URL", payload: { url } });
-  };
-
-  const handleToggleStatus = (id: string, currentStatus: UrlStatus) => {
-    let newStatus: UrlStatus;
-    if (currentStatus === "Crawling") {
-      newStatus = "Stopped";
-      clearCrawlTimer(id);
-    } else if (
-      currentStatus === "Stopped" ||
-      currentStatus === "Queued" ||
-      currentStatus === "Error"
-    ) {
-      newStatus = "Crawling";
-      const timer = setTimeout(() => {
-        dispatch({
-          type: "TOGGLE_STATUS",
-          payload: { id, newStatus: "Completed" },
-        });
-        // Show toast when crawl completes
-        toast.success("Crawl Completed!", {
-          description:
-            "Crawled successfully, go to results dashboard for details.",
-          duration: 5000,
-        });
-        crawlTimers.current.delete(id);
-      }, 10000); // 10 seconds
-      crawlTimers.current.set(id, timer);
-    } else {
-      newStatus = currentStatus;
-    }
-    dispatch({ type: "TOGGLE_STATUS", payload: { id, newStatus } });
-  };
-
-  const handleDeleteUrl = (id: string) => {
-    clearCrawlTimer(id);
-    dispatch({ type: "DELETE_URL", payload: { id } });
-  };
-
-  const handleToggleCheck = (id: string) => {
-    dispatch({ type: "TOGGLE_CHECK", payload: { id } });
-  };
-
-  const handleToggleSelectAll = (checked: boolean) => {
-    dispatch({ type: "TOGGLE_SELECT_ALL", payload: { checked } });
-  };
+  const { urls, crawlUrl, deleteUrl, toggleStatus, reRunUrl } =
+    useCrawlContext();
 
   const handleBulkDelete = () => {
-    urls
-      .filter((url) => url.isChecked)
-      .forEach((url) => clearCrawlTimer(url.id));
-    dispatch({ type: "BULK_DELETE" });
+    const checkedUrls = urls.filter((url) => url.isChecked);
+    if (checkedUrls.length === 0) {
+      toast.error("No URLs selected");
+      return;
+    }
+    checkedUrls.forEach((url) => deleteUrl(url.id));
   };
 
-  const handleReRunUrl = (id: string) => {
-    clearCrawlTimer(id);
-    dispatch({ type: "TOGGLE_STATUS", payload: { id, newStatus: "Queued" } });
-    console.log(`Re-running URL: ${id}`);
-    alert(`Simulated re-run for URL: ${id}. Status set to Queued.`);
+  const handleToggleCheck = (_id: string) => {
+    toast.error("Toggle check not implemented in context yet");
+  };
+
+  const handleToggleSelectAll = (_checked: boolean) => {
+    toast.error("Toggle select all not implemented in context yet");
   };
 
   const selectedUrlsCount = urls.filter((url) => url.isChecked).length;
@@ -163,18 +65,18 @@ export function UrlManagementScreen() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2, duration: 0.4 }}
           >
-            <AddUrlForm onAddUrl={handleAddUrl} />
+            <AddUrlForm onAddUrl={crawlUrl} />{" "}
             <BulkActions
               selectedCount={selectedUrlsCount}
               onBulkDelete={handleBulkDelete}
             />
             <UrlTable
               urls={urls}
-              onToggleStatus={handleToggleStatus}
-              onDeleteUrl={handleDeleteUrl}
+              onToggleStatus={toggleStatus}
+              onDeleteUrl={deleteUrl}
               onToggleCheck={handleToggleCheck}
               onToggleSelectAll={handleToggleSelectAll}
-              onReRunUrl={handleReRunUrl}
+              onReRunUrl={reRunUrl}
               allUrlsSelected={allUrlsSelected}
             />
           </motion.div>

@@ -2,27 +2,38 @@ import { z } from "zod";
 
 export const analyzedUrlSchema = z.object({
   id: z.string(),
-  title: z.string(),
   url: z.string().url(),
-  htmlVersion: z.string(),
-  internalLinks: z.number().int().min(0),
-  externalLinks: z.number().int().min(0),
-  brokenLinks: z.number().int().min(0),
-  brokenLinksList: z.array(z.string()),
-  hasLoginForm: z.boolean(),
-  statusCode: z.number().int().min(100).max(599), // HTTP status codes range from 100 to 599
+  page_title: z.string(),
+  h1: z.number().int().min(0),
+  h2: z.number().int().min(0),
+  h3: z.number().int().min(0),
+  h4: z.number().int().min(0),
+  h5: z.number().int().min(0),
+  h6: z.number().int().min(0),
+  internal_links: z.number().int().min(0),
+  external_links: z.number().int().min(0),
+  inaccessible_links: z.number().int().min(0),
+  has_login_form: z.boolean(),
+  created_at: z.string(),
+  html_version: z.string().optional(),
+  broken_links_list: z.array(z.string()).optional(),
+  status_code: z.number().optional(),
 });
 
 export type AnalyzedUrl = z.infer<typeof analyzedUrlSchema>;
 
+export const FiltersSchema = z.object({
+  page_title: z.string().optional(),
+  html_version: z.string().optional(),
+  has_login_form: z.enum(["all", "true", "false"]).optional(),
+  internal_links: z.number().optional(),
+  external_links: z.number().optional(),
+  inaccessible_links: z.number().optional(),
+});
+
+export type Filters = z.infer<typeof FiltersSchema>;
+
 export type SortConfig = {
   key: keyof AnalyzedUrl;
   direction: "asc" | "desc";
-} | null;
-
-export type Filters = {
-  title: string;
-  htmlVersion: string;
-  hasLoginForm: "all" | "true" | "false";
-  // Add more filter types as needed for other columns
 };

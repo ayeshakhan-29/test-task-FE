@@ -85,78 +85,80 @@ export function ResultsTable({
             <TableHead className="min-w-[150px]">
               <Button
                 variant="ghost"
-                onClick={() => onSort("title")}
+                onClick={() => onSort("page_title")}
                 className="px-0 hover:bg-transparent"
               >
-                Title {getSortIcon("title")}
+                Title {getSortIcon("page_title")}
               </Button>
               <Input
                 placeholder="Filter title"
-                value={filters.title}
-                onChange={(e) => onFilterChange("title", e.target.value)}
-                className="h-8 my-1 placeholder:text-sm md:placeholder:text-base"
+                value={filters.page_title}
+                onChange={(e) => onFilterChange("page_title", e.target.value)}
+                className="h-8 my-1 placeholder:text-sm lg:placeholder:text-base"
               />
             </TableHead>
             <TableHead className="min-w-[120px]">
               <Button
                 variant="ghost"
-                onClick={() => onSort("htmlVersion")}
+                onClick={() => onSort("html_version")}
                 className="px-0 hover:bg-transparent"
               >
-                HTML Version {getSortIcon("htmlVersion")}
+                HTML Version {getSortIcon("html_version")}
               </Button>
               <Input
                 placeholder="Filter version"
-                value={filters.htmlVersion}
-                onChange={(e) => onFilterChange("htmlVersion", e.target.value)}
-                className="h-8 my-1 placeholder:text-sm md:placeholder:text-base"
+                value={filters.html_version}
+                onChange={(e) => onFilterChange("html_version", e.target.value)}
+                className="h-8 my-1 placeholder:text-sm lg:placeholder:text-base"
               />
             </TableHead>
             <TableHead className="min-w-[100px] text-center">
               <Button
                 variant="ghost"
-                onClick={() => onSort("internalLinks")}
+                onClick={() => onSort("internal_links")}
                 className="px-0 hover:bg-transparent"
               >
                 Internal <LinkIcon className="ml-1 h-4 w-4" />{" "}
-                {getSortIcon("internalLinks")}
+                {getSortIcon("internal_links")}
               </Button>
               <div className="h-8 my-1" />
             </TableHead>
             <TableHead className="min-w-[100px] text-center">
               <Button
                 variant="ghost"
-                onClick={() => onSort("externalLinks")}
+                onClick={() => onSort("external_links")}
                 className="px-0 hover:bg-transparent"
               >
                 External <ExternalLink className="ml-1 h-4 w-4" />{" "}
-                {getSortIcon("externalLinks")}
+                {getSortIcon("external_links")}
               </Button>
               <div className="h-8 my-1" />
             </TableHead>
             <TableHead className="min-w-[100px] text-center">
               <Button
                 variant="ghost"
-                onClick={() => onSort("brokenLinks")}
+                onClick={() => onSort("inaccessible_links")}
                 className="px-0 hover:bg-transparent"
               >
                 Broken <XCircle className="ml-1 h-4 w-4" />{" "}
-                {getSortIcon("brokenLinks")}
+                {getSortIcon("inaccessible_links")}
               </Button>
               <div className="h-8 my-1" />
             </TableHead>
             <TableHead className="min-w-[120px] text-center">
               <Button
                 variant="ghost"
-                onClick={() => onSort("hasLoginForm")}
+                onClick={() => onSort("has_login_form")}
                 className="px-0 hover:bg-transparent"
               >
                 Login Form <Lock className="ml-1 h-4 w-4" />{" "}
-                {getSortIcon("hasLoginForm")}
+                {getSortIcon("has_login_form")}
               </Button>
               <Select
-                value={filters.hasLoginForm}
-                onValueChange={(value) => onFilterChange("hasLoginForm", value)}
+                value={filters.has_login_form}
+                onValueChange={(value) =>
+                  onFilterChange("has_login_form", value)
+                }
               >
                 <SelectTrigger className="h-8 my-1">
                   {" "}
@@ -189,34 +191,40 @@ export function ResultsTable({
                 className="cursor-pointer hover:bg-muted/50 transition-colors"
                 onClick={() => handleRowClick(item)}
               >
-                <TableCell className="font-medium">{item.title}</TableCell>
-                <TableCell>{item.htmlVersion}</TableCell>
+                <TableCell className="font-medium">
+                  {item.page_title.length > 50
+                    ? `${item.page_title.substring(0, 40)}...`
+                    : item.page_title}
+                </TableCell>
+                <TableCell>{item.html_version}</TableCell>
                 <TableCell className="text-center">
-                  {item.internalLinks}
+                  {item.internal_links}
                 </TableCell>
                 <TableCell className="text-center">
-                  {item.externalLinks}
+                  {item.external_links}
                 </TableCell>
                 <TableCell className="text-center">
                   <span
                     className={cn(
                       "font-medium",
-                      item.brokenLinks > 0 ? "text-red-600" : "text-green-600"
+                      item.inaccessible_links > 0
+                        ? "text-red-600"
+                        : "text-green-600"
                     )}
                   >
-                    {item.brokenLinks}
+                    {item.inaccessible_links}
                   </span>
                 </TableCell>
                 <TableCell className="text-center">
                   <span
                     className={cn(
                       "px-2 py-1 rounded-md",
-                      item.hasLoginForm
+                      item.has_login_form
                         ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
                         : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
                     )}
                   >
-                    {item.hasLoginForm ? "Yes" : "No"}
+                    {item.has_login_form ? "Yes" : "No"}
                   </span>
                 </TableCell>
               </TableRow>

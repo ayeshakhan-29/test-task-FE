@@ -23,7 +23,6 @@ export function PaginationControls({
   onPageChange,
   pageSize,
   onPageSizeChange,
-  totalItems,
 }: PaginationControlsProps) {
   const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
 
@@ -45,12 +44,8 @@ export function PaginationControls({
             <SelectItem value="100">100</SelectItem>
           </SelectContent>
         </Select>
-        <span className="ml-4">
-          {totalItems === 0 ? 0 : (currentPage - 1) * pageSize + 1} -{" "}
-          {Math.min(currentPage * pageSize, totalItems)} of {totalItems}
-        </span>
       </div>
-      <div className="flex items-center gap-2 md:mt-0 mt-2">
+      <div className="flex items-center gap-2 md:mt-0 mt-2 ml-4">
         <Button
           variant="outline"
           size="icon"

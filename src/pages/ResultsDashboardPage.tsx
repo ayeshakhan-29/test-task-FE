@@ -1,8 +1,15 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { BarChart3 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useState, useMemo, useEffect } from "react";
+import { Loader2 } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ResultsTable } from "@/components/results-dashboard/results-table";
 import { PaginationControls } from "@/components/results-dashboard/pagination-controls";
 import type {
@@ -10,24 +17,54 @@ import type {
   SortConfig,
   Filters,
 } from "@/lib/validations/results";
-
+import { useAnalyzedUrls } from "@/hooks/useAnalyzedUrls";
 import { useNavigate } from "react-router-dom";
-import { dummyResults } from "@/lib/data/results-data";
 import { motion } from "framer-motion";
 
-const ALL_RESULTS = dummyResults; // Use the pre-generated dummy results
-
 export function ResultsDashboard() {
-  const [sortConfig, setSortConfig] = useState<SortConfig>(null);
+  // All hooks must be called at the top level
+  const [sortConfig, setSortConfig] = useState<SortConfig>({
+    key: "page_title",
+    direction: "asc",
+  });
   const [filters, setFilters] = useState<Filters>({
-    title: "",
-    htmlVersion: "",
-    hasLoginForm: "all",
+    page_title: "",
+    html_version: "",
+    has_login_form: "all",
   });
   const [globalSearchTerm, setGlobalSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const navigate = useNavigate();
+
+  // Data fetching hook
+  const { data: analyzedUrls = [], isLoading, error } = useAnalyzedUrls();
+
+  // Debug log
+  React.useEffect(() => {
+    if (analyzedUrls.length > 0) {
+      console.log("Analyzed URLs from API:", analyzedUrls);
+    }
+  }, [analyzedUrls]);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-destructive">
+          Error loading results:{" "}
+          {error instanceof Error ? error.message : "Unknown error occurred"}
+        </p>
+      </div>
+    );
+  }
 
   const handleSort = (key: keyof AnalyzedUrl) => {
     let direction: "asc" | "desc" = "asc";
@@ -40,6 +77,79 @@ export function ResultsDashboard() {
     }
     setSortConfig({ key, direction });
   };
+
+  // Process and sort the results based on filters and sort config
+  const processedResults = useMemo(() => {
+    if (!analyzedUrls || !Array.isArray(analyzedUrls)) {
+      console.error("Invalid analyzedUrls data:", analyzedUrls);
+      return [];
+    }
+
+    // Apply filters
+    let results = analyzedUrls.filter((item) => {
+      if (!item) return false;
+
+      try {
+        const itemTitle = String(item.page_title || "").toLowerCase();
+        const searchTerm = String(globalSearchTerm || "").toLowerCase();
+        const filterTitle = String(filters.page_title || "").toLowerCase();
+
+        // Global search across all string fields
+        const globalMatch =
+          !searchTerm ||
+          [item.url || "", item.page_title || ""].some((value) =>
+            String(value || "")
+              .toLowerCase()
+              .includes(searchTerm)
+          );
+
+        // Individual filters
+        const titleMatch =
+          !filters.page_title || itemTitle.includes(filterTitle);
+
+        // Login form filter
+        const loginFormMatch =
+          filters.has_login_form === "all" ||
+          (filters.has_login_form === "true"
+            ? item.has_login_form
+            : !item.has_login_form);
+
+        return globalMatch && titleMatch && loginFormMatch;
+      } catch (err) {
+        console.error("Error filtering item:", item, err);
+        return false;
+      }
+    });
+
+    // Apply sorting if sortConfig is provided
+    if (sortConfig) {
+      results = [...results].sort((a, b) => {
+        const aValue = a[sortConfig.key];
+        const bValue = b[sortConfig.key];
+
+        // Handle undefined/null values
+        if (aValue == null) return sortConfig.direction === "asc" ? -1 : 1;
+        if (bValue == null) return sortConfig.direction === "asc" ? 1 : -1;
+
+        // Sort numbers
+        if (typeof aValue === "number" && typeof bValue === "number") {
+          return sortConfig.direction === "asc"
+            ? aValue - bValue
+            : bValue - aValue;
+        }
+
+        // Sort strings
+        const stringA = String(aValue).toLowerCase();
+        const stringB = String(bValue).toLowerCase();
+
+        return sortConfig.direction === "asc"
+          ? stringA.localeCompare(stringB)
+          : stringB.localeCompare(stringA);
+      });
+    }
+
+    return results;
+  }, [analyzedUrls, filters, globalSearchTerm, sortConfig]);
 
   const handleFilterChange = (key: keyof Filters, value: string | boolean) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -55,79 +165,28 @@ export function ResultsDashboard() {
     setCurrentPage(page);
   };
 
-  const handlePageSizeChange = (size: number) => {
-    setPageSize(size);
-    setCurrentPage(1); // Reset to first page on page size change
-  };
-
   const handleRowClick = (url: AnalyzedUrl) => {
     console.log("Clicked URL for details:", url);
     navigate(`/details/${url.id}`); // Navigate to the details page
   };
 
-  const filteredAndSortedData = useMemo(() => {
-    const filtered = ALL_RESULTS.filter((item) => {
-      // Global search
-      const globalMatch = globalSearchTerm
-        ? Object.values(item).some((value) =>
-            String(value).toLowerCase().includes(globalSearchTerm.toLowerCase())
-          )
-        : true;
+  useEffect(() => {
+    console.log("Processed results:", processedResults);
+  }, [processedResults]);
 
-      // Per-column filters
-      const titleMatch = item.title
-        .toLowerCase()
-        .includes(filters.title.toLowerCase());
-      const htmlVersionMatch = item.htmlVersion
-        .toLowerCase()
-        .includes(filters.htmlVersion.toLowerCase());
-      const loginFormMatch =
-        filters.hasLoginForm === "all"
-          ? true
-          : filters.hasLoginForm === "true"
-          ? item.hasLoginForm
-          : !item.hasLoginForm;
-
-      return globalMatch && titleMatch && htmlVersionMatch && loginFormMatch;
-    });
-
-    if (sortConfig) {
-      filtered.sort((a, b) => {
-        const aValue = a[sortConfig.key];
-        const bValue = b[sortConfig.key];
-
-        if (typeof aValue === "string" && typeof bValue === "string") {
-          return sortConfig.direction === "asc"
-            ? aValue.localeCompare(bValue)
-            : bValue.localeCompare(aValue);
-        }
-        if (typeof aValue === "number" && typeof bValue === "number") {
-          return sortConfig.direction === "asc"
-            ? aValue - bValue
-            : bValue - aValue;
-        }
-        if (typeof aValue === "boolean" && typeof bValue === "boolean") {
-          // Sort booleans: false before true for asc, true before false for desc
-          if (sortConfig.direction === "asc") {
-            return aValue === bValue ? 0 : aValue ? 1 : -1;
-          } else {
-            return aValue === bValue ? 0 : aValue ? -1 : 1;
-          }
-        }
-        return 0;
-      });
-    }
-
-    return filtered;
-  }, [globalSearchTerm, filters, sortConfig]);
-
-  const paginatedData = useMemo(() => {
+  const paginatedResults = useMemo(() => {
+    if (!processedResults.length) return [];
     const startIndex = (currentPage - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
-    return filteredAndSortedData.slice(startIndex, endIndex);
-  }, [filteredAndSortedData, currentPage, pageSize]);
+    return processedResults.slice(startIndex, startIndex + pageSize);
+  }, [processedResults, currentPage, pageSize]);
 
-  const totalPages = Math.ceil(filteredAndSortedData.length / pageSize);
+  const totalPages = Math.max(1, Math.ceil(processedResults.length / pageSize));
+
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(1);
+    }
+  }, [currentPage, totalPages]);
 
   return (
     <motion.div
@@ -136,61 +195,123 @@ export function ResultsDashboard() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
     >
-      <Card>
-        <CardHeader>
-          <motion.div
-            className="flex items-center gap-2"
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2, duration: 0.4, ease: "easeOut" }}
-          >
-            <motion.div
-              className="flex items-center gap-2"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 0.6,
-                ease: "easeOut",
-              }}
-            >
-              <BarChart3 className="h-6 w-6" />
-            </motion.div>
-            <motion.h2
-              className="text-xl font-semibold"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{
-                delay: 0.4,
-                duration: 0.5,
-                ease: [0.25, 0.1, 0.25, 1],
-              }}
-            >
-              Results Dashboard
-            </motion.h2>
-          </motion.div>
-        </CardHeader>
+      <div className="flex flex-col space-y-4">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold">Results Dashboard</h1>
+        </div>
 
-        <CardContent>
-          <ResultsTable
-            data={paginatedData}
-            sortConfig={sortConfig}
-            onSort={handleSort}
-            filters={filters}
-            onFilterChange={handleFilterChange}
-            onRowClick={handleRowClick}
-            globalSearchTerm={globalSearchTerm}
-            onGlobalSearchChange={handleGlobalSearchChange}
-          />
-          <PaginationControls
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-            pageSize={pageSize}
-            onPageSizeChange={handlePageSizeChange}
-            totalItems={filteredAndSortedData.length}
-          />
-        </CardContent>
-      </Card>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <Card>
+            <CardContent className="p-6">
+              <div className="text-2xl font-bold">
+                {processedResults.length}
+              </div>
+              <p className="text-sm text-muted-foreground">Total Results</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-6">
+              <div className="text-2xl font-bold">
+                {processedResults.filter((r) => r.has_login_form).length}
+              </div>
+              <p className="text-sm text-muted-foreground">With Login Form</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-6">
+              <div className="text-2xl font-bold">
+                {
+                  processedResults.filter((r) => r.inaccessible_links > 0)
+                    .length
+                }
+              </div>
+              <p className="text-sm text-muted-foreground">With Broken Links</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-6">
+              <div className="text-2xl font-bold">
+                {new Date().toLocaleDateString()}
+              </div>
+              <p className="text-sm text-muted-foreground">Last Updated</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold">Crawl Results</h2>
+              <div className="flex items-center space-x-2">
+                <Select
+                  value={filters.has_login_form}
+                  onValueChange={(value) =>
+                    handleFilterChange("has_login_form", value)
+                  }
+                >
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Filter by login form" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Results</SelectItem>
+                    <SelectItem value="true">With Login Form</SelectItem>
+                    <SelectItem value="false">Without Login Form</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <ResultsTable
+              data={paginatedResults}
+              sortConfig={sortConfig}
+              onSort={handleSort}
+              filters={filters}
+              onFilterChange={handleFilterChange}
+              onRowClick={handleRowClick}
+              globalSearchTerm={globalSearchTerm}
+              onGlobalSearchChange={handleGlobalSearchChange}
+            />
+
+            {paginatedResults.length > 0 ? (
+              <div className="mt-4 flex flex-col md:flex-row items-center justify-between">
+                <div className="text-sm text-muted-foreground">
+                  Showing{" "}
+                  <span className="font-medium">
+                    {Math.min(
+                      (currentPage - 1) * pageSize + 1,
+                      processedResults.length
+                    )}
+                  </span>{" "}
+                  to{" "}
+                  <span className="font-medium">
+                    {Math.min(currentPage * pageSize, processedResults.length)}
+                  </span>{" "}
+                  of{" "}
+                  <span className="font-medium">{processedResults.length}</span>{" "}
+                  results
+                </div>
+                <div className="flex items-center space-x-1">
+                  <PaginationControls
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                    pageSize={pageSize}
+                    onPageSizeChange={(size) => {
+                      setPageSize(size);
+                      setCurrentPage(1);
+                    }}
+                    totalItems={processedResults.length}
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">No results found</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </motion.div>
   );
 }

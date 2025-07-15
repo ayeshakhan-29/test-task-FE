@@ -33,6 +33,7 @@ interface UrlTableProps {
   isLoading?: boolean;
   isError?: boolean;
   error?: string;
+  selectedIds: string[];
 }
 
 export function UrlTable({
@@ -46,6 +47,7 @@ export function UrlTable({
   isLoading = false,
   isError = false,
   error,
+  selectedIds,
 }: UrlTableProps) {
   if (isLoading) {
     return (
@@ -72,6 +74,8 @@ export function UrlTable({
     );
   }
 
+  console.log(urls, "urls");
+
   return (
     <div className="overflow-x-auto">
       <Table>
@@ -96,7 +100,7 @@ export function UrlTable({
             <TableRow key={urlItem.id}>
               <TableCell>
                 <Checkbox
-                  checked={urlItem.isChecked}
+                  checked={selectedIds.includes(urlItem.id)}
                   onCheckedChange={() => onToggleCheck(urlItem.id)}
                   aria-label={`Select URL ${urlItem.url}`}
                 />

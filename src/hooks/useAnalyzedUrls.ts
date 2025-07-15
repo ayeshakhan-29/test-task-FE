@@ -22,6 +22,7 @@ interface CrawlResponse {
   external_links: number;
   inaccessible_links: number;
   has_login_form: boolean;
+  html_version: string;
 }
 
 export const useAnalyzedUrls = () => {
@@ -48,7 +49,7 @@ export const useAnalyzedUrls = () => {
             : [],
           has_login_form: Boolean(crawl.has_login_form),
           created_at: new Date(crawl.created_at).toISOString(),
-          html_version: "",
+          html_version: crawl.html_version,
           broken_links_list: [],
           status_code: 200,
         }));
@@ -57,6 +58,9 @@ export const useAnalyzedUrls = () => {
         throw error;
       }
     },
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+    staleTime: 0,
   });
 };
 

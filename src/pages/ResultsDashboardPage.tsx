@@ -1,15 +1,8 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { ResultsTable } from "@/components/results-dashboard/results-table";
 import { PaginationControls } from "@/components/results-dashboard/pagination-controls";
 import type {
@@ -39,13 +32,6 @@ export function ResultsDashboard() {
 
   // Data fetching hook
   const { data: analyzedUrls = [], isLoading, error } = useAnalyzedUrls();
-
-  // Debug log
-  React.useEffect(() => {
-    if (analyzedUrls.length > 0) {
-      console.log("Analyzed URLs from API:", analyzedUrls);
-    }
-  }, [analyzedUrls]);
 
   if (isLoading) {
     return (
@@ -103,11 +89,9 @@ export function ResultsDashboard() {
               .includes(searchTerm)
           );
 
-        // Individual filters
         const titleMatch =
           !filters.page_title || itemTitle.includes(filterTitle);
 
-        // Login form filter
         const loginFormMatch =
           filters.has_login_form === "all" ||
           (filters.has_login_form === "true"
@@ -240,25 +224,7 @@ export function ResultsDashboard() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">Crawl Results</h2>
-              <div className="flex items-center space-x-2">
-                <Select
-                  value={filters.has_login_form}
-                  onValueChange={(value) =>
-                    handleFilterChange("has_login_form", value)
-                  }
-                >
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Filter by login form" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Results</SelectItem>
-                    <SelectItem value="true">With Login Form</SelectItem>
-                    <SelectItem value="false">Without Login Form</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
             </div>
-
             <ResultsTable
               data={paginatedResults}
               sortConfig={sortConfig}

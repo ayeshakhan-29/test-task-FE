@@ -207,12 +207,12 @@ export function ResultsTable({
                   <span
                     className={cn(
                       "font-medium",
-                      item.inaccessible_links > 0
+                      (item.inaccessible_links?.length || 0) > 0
                         ? "text-red-600"
                         : "text-green-600"
                     )}
                   >
-                    {item.inaccessible_links}
+                    {item.inaccessible_links?.length || 0}
                   </span>
                 </TableCell>
                 <TableCell className="text-center">

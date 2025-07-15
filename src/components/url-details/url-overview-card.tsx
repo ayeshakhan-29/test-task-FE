@@ -1,14 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  LinkIcon,
-  ExternalLink,
-  XCircle,
-  Lock,
-  Code,
-  Server,
-} from "lucide-react";
+import { LinkIcon, ExternalLink, XCircle, Lock, Code } from "lucide-react";
 import type { AnalyzedUrl } from "@/lib/validations/results";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion"; // Import motion
@@ -34,54 +27,38 @@ export function UrlOverviewCard({ urlData, delay = 0 }: UrlOverviewCardProps) {
           <div className="grid gap-2 text-sm">
             <div className="flex items-center gap-2">
               <Code className="h-4 w-4 text-muted-foreground" />
-              <strong>HTML Version:</strong> {urlData.htmlVersion}
-            </div>
-            <div className="flex items-center gap-2">
-              <Server className="h-4 w-4 text-muted-foreground" />
-              <strong>Status Code:</strong>{" "}
-              <span
-                className={cn(
-                  "font-medium",
-                  urlData.statusCode >= 200 &&
-                    urlData.statusCode < 300 &&
-                    "text-green-600",
-                  urlData.statusCode >= 400 &&
-                    urlData.statusCode < 500 &&
-                    "text-yellow-600",
-                  urlData.statusCode >= 500 && "text-red-600"
-                )}
-              >
-                {urlData.statusCode}
-              </span>
+              <strong>HTML Version:</strong> {urlData.html_version}
             </div>
             <div className="flex items-center gap-2">
               <Lock className="h-4 w-4 text-muted-foreground" />
               <strong>Login Form Found:</strong>{" "}
               <span
                 className={cn(
-                  urlData.hasLoginForm ? "text-green-600" : "text-red-600"
+                  urlData.has_login_form ? "text-green-600" : "text-red-600"
                 )}
               >
-                {urlData.hasLoginForm ? "Yes" : "No"}
+                {urlData.has_login_form ? "Yes" : "No"}
               </span>
             </div>
             <div className="flex items-center gap-2">
               <LinkIcon className="h-4 w-4 text-muted-foreground" />
-              <strong>Internal Links:</strong> {urlData.internalLinks}
+              <strong>Internal Links:</strong> {urlData.internal_links}
             </div>
             <div className="flex items-center gap-2">
               <ExternalLink className="h-4 w-4 text-muted-foreground" />
-              <strong>External Links:</strong> {urlData.externalLinks}
+              <strong>External Links:</strong> {urlData.external_links}
             </div>
             <div className="flex items-center gap-2">
               <XCircle className="h-4 w-4 text-muted-foreground" />
               <strong>Broken Links:</strong>{" "}
               <span
                 className={cn(
-                  urlData.brokenLinks > 0 ? "text-red-600" : "text-green-600"
+                  urlData.inaccessible_links?.length > 0
+                    ? "text-red-600"
+                    : "text-green-600"
                 )}
               >
-                {urlData.brokenLinks}
+                {urlData.inaccessible_links?.length}
               </span>
             </div>
           </div>

@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
   Card,
@@ -10,29 +9,15 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { BarChart3, Loader2 } from "lucide-react";
-import type { AnalyzedUrl } from "@/lib/validations/results";
-
 import { UrlOverviewCard } from "@/components/url-details/url-overview-card";
 import { LinkRatioChartCard } from "@/components/url-details/link-ratio-chart-card";
 import { BrokenLinksListCard } from "@/components/url-details/broken-links-list-card";
-import { dummyResults } from "@/lib/data/results-data";
 import { motion } from "framer-motion";
+import { useAnalyzedUrlById } from "@/hooks/useAnalyzedUrls";
 
 export function UrlDetailsPage() {
   const { id } = useParams<{ id: string }>();
-  const [urlData, setUrlData] = useState<AnalyzedUrl | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // Simulate API call with a small delay
-    const timer = setTimeout(() => {
-      const foundUrl = dummyResults.find((url) => url.id === id) || null;
-      setUrlData(foundUrl);
-      setIsLoading(false);
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [id]);
+  const { data: urlData, isLoading } = useAnalyzedUrlById(id || "");
 
   if (isLoading) {
     return (
@@ -53,7 +38,7 @@ export function UrlDetailsPage() {
 
   return (
     <motion.div
-      className="p-4 md:p-6 lg:p-8"
+      className="p-4 md:p-6 lg:p-8 w-full overflow-hidden"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
@@ -72,7 +57,7 @@ export function UrlDetailsPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.4, ease: "easeOut" }}
             >
-              <CardTitle>URL Details: {urlData.title}</CardTitle>
+              <CardTitle>URL Details</CardTitle>
             </motion.span>
           </motion.div>
 
@@ -81,15 +66,26 @@ export function UrlDetailsPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.4 }}
           >
-            <CardDescription className="break-all">
-              {urlData.url}
+            <CardDescription className="break-all flex gap-2 mt-2">
+              <p className="font-semibold whitespace-nowrap">Page Title:</p>
+              <p>{urlData.page_title}</p>
+            </CardDescription>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.4 }}
+          >
+            <CardDescription className="break-all flex gap-2">
+              <p className="font-semibold">URL:</p>
+              <p>{urlData.url}</p>
             </CardDescription>
           </motion.div>
         </CardHeader>
 
         <CardContent>
           <motion.div
-            className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
+            className="grid gap-6 w-full grid-cols-1 lg:grid-cols-3"
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.4, duration: 0.4 }}

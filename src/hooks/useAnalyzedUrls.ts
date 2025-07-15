@@ -30,8 +30,7 @@ export const useAnalyzedUrls = () => {
     queryFn: async () => {
       try {
         const response = await api.get<CrawlResponse[]>("/crawls");
-        console.log('Raw API response:', response.data);
-        
+
         return response.data.map((crawl) => ({
           id: crawl.id.toString(),
           url: crawl.url,
@@ -44,17 +43,35 @@ export const useAnalyzedUrls = () => {
           h6: crawl.headings.h6 || 0,
           internal_links: crawl.internal_links || 0,
           external_links: crawl.external_links || 0,
-          inaccessible_links: crawl.inaccessible_links || 0,
+          inaccessible_links: crawl.inaccessible_links
+            ? [crawl.inaccessible_links.toString()]
+            : [],
           has_login_form: Boolean(crawl.has_login_form),
           created_at: new Date(crawl.created_at).toISOString(),
           html_version: "",
           broken_links_list: [],
-          status_code: 200
+          status_code: 200,
         }));
       } catch (error) {
-        console.error('Error fetching analyzed URLs:', error);
+        console.error("Error fetching analyzed URLs:", error);
         throw error;
       }
     },
+  });
+};
+
+export const useAnalyzedUrlById = (id: string) => {
+  return useQuery<AnalyzedUrl | null>({
+    queryKey: ["analyzed-url", id],
+    queryFn: async () => {
+      try {
+        const response = await api.get<AnalyzedUrl>(`/analyzed-url/${id}`);
+        return response.data;
+      } catch (error) {
+        console.error("Error fetching URL data:", error);
+        return null;
+      }
+    },
+    enabled: !!id,
   });
 };

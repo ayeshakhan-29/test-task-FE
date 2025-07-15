@@ -8,11 +8,11 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import type { AnalyzedUrl } from "@/lib/validations/results";
-import { motion } from "framer-motion"; // Import motion
+import { motion } from "framer-motion";
 
 interface BrokenLinksListCardProps {
   urlData: AnalyzedUrl;
-  delay?: number; // Add delay prop
+  delay?: number;
 }
 
 export function BrokenLinksListCard({
@@ -32,9 +32,9 @@ export function BrokenLinksListCard({
           <CardDescription>List of detected broken links</CardDescription>
         </CardHeader>
         <CardContent>
-          {urlData.brokenLinksList && urlData.brokenLinksList.length > 0 ? (
+          {urlData.inaccessible_links.length > 0 ? (
             <ul className="list-disc pl-5 space-y-1 text-sm">
-              {urlData.brokenLinksList.map((link, index) => (
+              {urlData.inaccessible_links.map((link, index) => (
                 <li key={index} className="break-all">
                   <a
                     href={link}

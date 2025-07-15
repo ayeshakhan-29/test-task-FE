@@ -79,14 +79,14 @@ export function ResultsDashboard() {
   };
 
   // Process and sort the results based on filters and sort config
-  const processedResults = useMemo(() => {
+  const processedResults = useMemo<AnalyzedUrl[]>(() => {
     if (!analyzedUrls || !Array.isArray(analyzedUrls)) {
       console.error("Invalid analyzedUrls data:", analyzedUrls);
       return [];
     }
 
     // Apply filters
-    let results = analyzedUrls.filter((item) => {
+    let results = analyzedUrls.filter((item: AnalyzedUrl) => {
       if (!item) return false;
 
       try {
@@ -166,13 +166,10 @@ export function ResultsDashboard() {
   };
 
   const handleRowClick = (url: AnalyzedUrl) => {
-    console.log("Clicked URL for details:", url);
-    navigate(`/details/${url.id}`); // Navigate to the details page
+    navigate(`/details/${url.id}`);
   };
 
-  useEffect(() => {
-    console.log("Processed results:", processedResults);
-  }, [processedResults]);
+  useEffect(() => {}, [processedResults]);
 
   const paginatedResults = useMemo(() => {
     if (!processedResults.length) return [];
@@ -221,8 +218,9 @@ export function ResultsDashboard() {
             <CardContent className="p-6">
               <div className="text-2xl font-bold">
                 {
-                  processedResults.filter((r) => r.inaccessible_links > 0)
-                    .length
+                  processedResults.filter(
+                    (r) => r.inaccessible_links.length > 0
+                  ).length
                 }
               </div>
               <p className="text-sm text-muted-foreground">With Broken Links</p>

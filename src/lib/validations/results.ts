@@ -12,7 +12,7 @@ export const analyzedUrlSchema = z.object({
   h6: z.number().int().min(0),
   internal_links: z.number().int().min(0),
   external_links: z.number().int().min(0),
-  inaccessible_links: z.number().int().min(0),
+  inaccessible_links: z.array(z.string()).min(0),
   has_login_form: z.boolean(),
   created_at: z.string(),
   html_version: z.string().optional(),
@@ -28,7 +28,7 @@ export const FiltersSchema = z.object({
   has_login_form: z.enum(["all", "true", "false"]).optional(),
   internal_links: z.number().optional(),
   external_links: z.number().optional(),
-  inaccessible_links: z.number().optional(),
+  inaccessible_links: z.array(z.string()).optional(),
 });
 
 export type Filters = z.infer<typeof FiltersSchema>;

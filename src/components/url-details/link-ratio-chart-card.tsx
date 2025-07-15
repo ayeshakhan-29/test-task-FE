@@ -28,8 +28,8 @@ export function LinkRatioChartCard({
   delay = 0,
 }: LinkRatioChartCardProps) {
   const linkData = [
-    { name: "Internal Links", value: urlData.internalLinks },
-    { name: "External Links", value: urlData.externalLinks },
+    { name: "Internal Links", value: urlData.internal_links },
+    { name: "External Links", value: urlData.external_links },
   ];
 
   return (
@@ -45,7 +45,7 @@ export function LinkRatioChartCard({
           <CardDescription>Internal vs. External Links</CardDescription>
         </CardHeader>
         <CardContent className="flex items-center justify-center h-[250px]">
-          {urlData.internalLinks + urlData.externalLinks > 0 ? (
+          {urlData.internal_links + urlData.external_links > 0 ? (
             <ChartContainer
               config={{
                 internal: {

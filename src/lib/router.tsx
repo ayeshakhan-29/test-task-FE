@@ -14,6 +14,7 @@ import { CrawlProvider } from "@/context/CrawlContext";
 
 export const router = createBrowserRouter([
   {
+    path: "/",
     element: (
       <AuthProvider>
         <CrawlProvider>
@@ -39,7 +40,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "/",
+        path: "",
         element: (
           <ProtectedRoute>
             <HomePage />

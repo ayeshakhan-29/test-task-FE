@@ -38,14 +38,18 @@ export function AddUrlForm({ onAddUrl }: AddUrlFormProps) {
           render={({ field }) => (
             <FormItem className="flex-grow">
               <FormControl>
-                <Input placeholder="https://example.com" {...field} />
+                <Input
+                  className="placeholder:text-sm md:placeholder:text-base"
+                  placeholder="https://example.com"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit">
-          <Plus className="h-4 w-4 mr-2" /> Add URL
+        <Button type="submit" className="text-xs md:text-base">
+          <Plus className="md:h-4 md:w-4 h-3 w-3 mr-2" /> Add URL
         </Button>
       </form>
     </Form>

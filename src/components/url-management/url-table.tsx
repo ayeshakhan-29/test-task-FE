@@ -74,8 +74,6 @@ export function UrlTable({
     );
   }
 
-  console.log(urls, "urls");
-
   return (
     <div className="overflow-x-auto">
       <Table>

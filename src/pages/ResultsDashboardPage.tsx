@@ -13,6 +13,7 @@ import type {
 import { useAnalyzedUrls } from "@/hooks/useAnalyzedUrls";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useSidebar } from "@/context/SidebarContext";
 
 export function ResultsDashboard() {
   // All hooks must be called at the top level
@@ -168,15 +169,21 @@ export function ResultsDashboard() {
       setCurrentPage(1);
     }
   }, [currentPage, totalPages]);
+  const { isSidebarOpen } = useSidebar();
 
   return (
     <motion.div
-      className="p-4 md:p-6 lg:p-8"
+      className="min-h-screen p-4 md:p-6 lg:p-8"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
     >
-      <div className="flex flex-col space-y-4">
+      <div
+        className="flex flex-col space-y-4 w-full transition-all duration-200 ease-linear"
+        style={{
+          maxWidth: isSidebarOpen ? "calc(100vw - 22rem)" : "100vw",
+        }}
+      >
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">Results Dashboard</h1>
         </div>
@@ -237,7 +244,7 @@ export function ResultsDashboard() {
             />
 
             {paginatedResults.length > 0 ? (
-              <div className="mt-4 flex flex-col md:flex-row items-center justify-between">
+              <div className="mt-4 flex flex-col lg:flex-row items-center justify-between">
                 <div className="text-sm text-muted-foreground">
                   Showing{" "}
                   <span className="font-medium">

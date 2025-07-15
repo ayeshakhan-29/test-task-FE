@@ -97,6 +97,66 @@ export function ResultsTable({
                 className="h-8 my-1 placeholder:text-sm lg:placeholder:text-base"
               />
             </TableHead>
+            <TableHead className="min-w-[80px] text-center">
+              <Button
+                variant="ghost"
+                onClick={() => onSort("h1")}
+                className="px-0 hover:bg-transparent"
+              >
+                H1 {getSortIcon("h1")}
+              </Button>
+              <div className="h-8 my-1" />
+            </TableHead>
+            <TableHead className="min-w-[80px] text-center">
+              <Button
+                variant="ghost"
+                onClick={() => onSort("h2")}
+                className="px-0 hover:bg-transparent"
+              >
+                H2 {getSortIcon("h2")}
+              </Button>
+              <div className="h-8 my-1" />
+            </TableHead>
+            <TableHead className="min-w-[80px] text-center">
+              <Button
+                variant="ghost"
+                onClick={() => onSort("h3")}
+                className="px-0 hover:bg-transparent"
+              >
+                H3 {getSortIcon("h3")}
+              </Button>
+              <div className="h-8 my-1" />
+            </TableHead>
+            <TableHead className="min-w-[80px] text-center">
+              <Button
+                variant="ghost"
+                onClick={() => onSort("h4")}
+                className="px-0 hover:bg-transparent"
+              >
+                H4 {getSortIcon("h4")}
+              </Button>
+              <div className="h-8 my-1" />
+            </TableHead>
+            <TableHead className="min-w-[80px] text-center">
+              <Button
+                variant="ghost"
+                onClick={() => onSort("h5")}
+                className="px-0 hover:bg-transparent"
+              >
+                H5 {getSortIcon("h5")}
+              </Button>
+              <div className="h-8 my-1" />
+            </TableHead>
+            <TableHead className="min-w-[80px] text-center">
+              <Button
+                variant="ghost"
+                onClick={() => onSort("h6")}
+                className="px-0 hover:bg-transparent"
+              >
+                H6 {getSortIcon("h6")}
+              </Button>
+              <div className="h-8 my-1" />
+            </TableHead>
             <TableHead className="min-w-[120px]">
               <Button
                 variant="ghost"
@@ -161,8 +221,6 @@ export function ResultsTable({
                 }
               >
                 <SelectTrigger className="h-8 my-1">
-                  {" "}
-                  {/* Changed to my-1 for top and bottom margin */}
                   <SelectValue placeholder="Filter" />
                 </SelectTrigger>
                 <SelectContent>
@@ -178,7 +236,7 @@ export function ResultsTable({
           {data.length === 0 ? (
             <TableRow>
               <TableCell
-                colSpan={6}
+                colSpan={12}
                 className="h-24 text-center text-muted-foreground"
               >
                 No results found.
@@ -196,6 +254,12 @@ export function ResultsTable({
                     ? `${item.page_title.substring(0, 40)}...`
                     : item.page_title}
                 </TableCell>
+                <TableCell className="text-center">{item.h1}</TableCell>
+                <TableCell className="text-center">{item.h2}</TableCell>
+                <TableCell className="text-center">{item.h3}</TableCell>
+                <TableCell className="text-center">{item.h4}</TableCell>
+                <TableCell className="text-center">{item.h5}</TableCell>
+                <TableCell className="text-center">{item.h6}</TableCell>
                 <TableCell>{item.html_version}</TableCell>
                 <TableCell className="text-center">
                   {item.internal_links}

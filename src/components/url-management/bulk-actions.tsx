@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Trash2 } from "lucide-react";
+import { Trash2, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -34,9 +34,20 @@ export function BulkActions({ selectedCount, onBulkDelete }: BulkActionsProps) {
   return (
     <>
       <div className="mb-4 flex justify-end text-white">
-        <Button variant="destructive" onClick={() => setShowConfirm(true)}>
-          <Trash2 className="h-4 w-4 mr-2" /> Delete Selected ({selectedCount})
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="destructive"
+            onClick={() => setShowConfirm(true)}
+            className="text-xs md:text-base"
+          >
+            <Trash2 className="md:h-4 md:w-4 h-3 w-3 mr-2" /> Delete Selected (
+            {selectedCount})
+          </Button>
+          <Button className="text-xs md:text-base">
+            <RefreshCw className="md:h-4 md:w-4 h-3 w-3 mr-2" /> Re-run Analysis
+            ({selectedCount})
+          </Button>
+        </div>
       </div>
 
       <AlertDialog open={showConfirm} onOpenChange={setShowConfirm}>

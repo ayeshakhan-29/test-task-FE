@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { LinkIcon } from "lucide-react";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,6 +9,8 @@ import { UrlTable } from "@/components/url-management/url-table";
 import { BulkActions } from "@/components/url-management/bulk-actions";
 import { useCrawlContext } from "@/context/CrawlContext";
 import { motion } from "framer-motion";
+import type { UrlItem } from "@/lib/validations/url";
+import { useBulkDelete } from "@/hooks/useBulkDelete";
 
 export function UrlManagementScreen() {
   const {
@@ -22,25 +25,10 @@ export function UrlManagementScreen() {
     reRunUrl,
   } = useCrawlContext();
 
-  const handleBulkDelete = () => {
-    const checkedUrls = urls.filter((url) => url.isChecked);
-    if (checkedUrls.length === 0) {
-      toast.error("No URLs selected");
-      return;
-    }
-    checkedUrls.forEach((url) => deleteUrl(url.id));
-  };
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const { mutate: bulkDelete } = useBulkDelete();
 
-  const handleToggleCheck = (_id: string) => {
-    toast.error("Toggle check not implemented in context yet");
-  };
-
-  const handleToggleSelectAll = (_checked: boolean) => {
-    toast.error("Toggle select all not implemented in context yet");
-  };
-
-  const allUrls = [...urls];
-
+  const allUrls: UrlItem[] = [...urls];
   crawledUrls.forEach((crawledUrl) => {
     if (!allUrls.some((url) => url.id === crawledUrl.id)) {
       allUrls.push({
@@ -52,9 +40,41 @@ export function UrlManagementScreen() {
     }
   });
 
-  const selectedUrlsCount = allUrls.filter((url) => url.isChecked).length;
+  const handleToggleCheck = (id: string) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((v) => v !== id) : [...prev, id]
+    );
+  };
+
+  const handleToggleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(allUrls.map((url) => url.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedIds.length === 0) {
+      toast.error("No URLs selected");
+      return;
+    }
+
+    bulkDelete(
+      { ids: selectedIds },
+      {
+        onSuccess: async () => {
+          setSelectedIds([]);
+        },
+        onError: (error) => {
+          toast.error(`Bulk delete failed: ${error.message}`);
+        },
+      }
+    );
+  };
+
   const allUrlsSelected =
-    allUrls.length > 0 && allUrls.every((url) => url.isChecked);
+    allUrls.length > 0 && allUrls.every((url) => selectedIds.includes(url.id));
 
   return (
     <motion.div
@@ -88,13 +108,14 @@ export function UrlManagementScreen() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2, duration: 0.4 }}
           >
-            <AddUrlForm onAddUrl={crawlUrl} />{" "}
+            <AddUrlForm onAddUrl={crawlUrl} />
             <BulkActions
-              selectedCount={selectedUrlsCount}
+              selectedCount={selectedIds.length}
               onBulkDelete={handleBulkDelete}
             />
             <UrlTable
               urls={allUrls}
+              selectedIds={selectedIds}
               onToggleStatus={toggleStatus}
               onDeleteUrl={deleteUrl}
               onToggleCheck={handleToggleCheck}

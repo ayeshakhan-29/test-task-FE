@@ -110,7 +110,7 @@ export function CrawlProvider({ children }: { children: ReactNode }) {
             type: "TOGGLE_STATUS",
             payload: { id: tempId, newStatus: "Completed" },
           });
-          toast.success("Crawl completed!");
+          toast.success("Crawl completed! Please check results dashboard");
         },
         onError: (error: AxiosError) => {
           dispatch({
@@ -224,7 +224,7 @@ export function CrawlProvider({ children }: { children: ReactNode }) {
               type: "TOGGLE_STATUS",
               payload: { id, newStatus: "Completed" },
             });
-            toast.success("Re-crawl completed!");
+            toast.success("Re-crawl completed! Please check results dashboard");
             timers.current.delete(id);
             refetch();
           }, 10000);

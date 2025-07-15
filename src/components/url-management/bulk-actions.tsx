@@ -22,6 +22,11 @@ interface BulkActionsProps {
 export function BulkActions({ selectedCount, onBulkDelete }: BulkActionsProps) {
   const [showConfirm, setShowConfirm] = useState(false);
 
+  const handleConfirmDelete = () => {
+    onBulkDelete();
+    setShowConfirm(false);
+  };
+
   if (selectedCount === 0) {
     return null;
   }
@@ -45,7 +50,9 @@ export function BulkActions({ selectedCount, onBulkDelete }: BulkActionsProps) {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={onBulkDelete}>Delete</AlertDialogAction>
+            <AlertDialogAction onClick={handleConfirmDelete}>
+              Delete
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

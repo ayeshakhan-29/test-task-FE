@@ -18,4 +18,20 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: [
+            "react",
+            "react-dom",
+            "react-router-dom",
+            "@tanstack/react-query",
+          ],
+          utils: ["zod", "axios"],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 1000,
+  },
 });

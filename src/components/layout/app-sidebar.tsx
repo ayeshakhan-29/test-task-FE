@@ -2,14 +2,7 @@
 
 import type * as React from "react";
 import { Link } from "react-router-dom";
-import {
-  LayoutDashboard,
-  LinkIcon,
-  Info,
-  Globe,
-  ReceiptText,
-  Grid2x2Check,
-} from "lucide-react";
+import { LinkIcon, Globe, ReceiptText, Grid2x2Check } from "lucide-react";
 
 import {
   Sidebar,
